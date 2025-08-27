@@ -19,6 +19,7 @@ from pathlib import Path
 import torch
 import torch.distributed as dist
 from torch import inf
+import copy
 
 
 class SmoothedValue(object):
@@ -292,14 +293,23 @@ def get_grad_norm_(parameters, norm_type: float = 2.0) -> torch.Tensor:
     return total_norm
 
 
-def save_model(args, epoch, model, model_without_ddp, optimizer, loss_scaler):
+def save_model(args, epoch, model, model_without_ddp, optimizer, loss_scaler, ema_params = None):
     output_dir = Path(args.output_dir)
     epoch_name = str(epoch)
     if loss_scaler is not None:
         checkpoint_paths = [output_dir / ('checkpoint-%s.pth' % epoch_name)]
         for checkpoint_path in checkpoint_paths:
+            if ema_params is not None:
+                ema_state_dict = copy.deepcopy(model_without_ddp.state_dict())
+                for i, (name, _value) in enumerate(model_without_ddp.named_parameters()):
+                    assert name in ema_state_dict
+                    ema_state_dict[name] = ema_params[i]
+            else:
+                ema_state_dict = None
+
             to_save = {
                 'model': model_without_ddp.state_dict(),
+                'model_ema': ema_state_dict, 
                 'optimizer': optimizer.state_dict(),
                 'epoch': epoch,
                 'scaler': loss_scaler.state_dict(),
