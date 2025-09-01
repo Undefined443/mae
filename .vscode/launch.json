@@ -1,0 +1,60 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "train",
+      "module": "torch.distributed.run",
+      "cwd": "${workspaceFolder}",
+      "request": "launch",
+      "type": "debugpy",
+      "args": [
+        "--nproc-per-node=1",
+        "--standalone",
+        "main_finetune.py",
+        "--batch_size=128",
+        "--model=vit_base_patch16",
+        "--epochs=300",
+        "--blr=1e-4",
+        "--layer_decay=0.75",
+        "--weight_decay=0.3",
+        "--drop_path=0.1",
+        "--reprob=0.25",
+        "--mixup=0.8",
+        "--cutmix=1.0",
+        "--dist_eval",
+        "--data_path=data",
+        "--accum_iter=8",
+        "--warmup_epochs=20",
+        "--aa=rand-m9-mstd0.5-inc1",
+        "--output_dir=temp"
+      ],
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "12",
+        "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "5.0"
+      }
+    },
+    {
+      "name": "evaluate",
+      "module": "torch.distributed.run",
+      "cwd": "${workspaceFolder}",
+      "type": "debugpy",
+      "request": "launch",
+      "args": [
+        "--nproc-per-node=1",
+        "--standalone",
+        "main_finetune.py",
+        "--eval",
+        "--resume=output/checkpoint-299.pth",
+        "--model=vit_base_patch16",
+        "--batch_size=16",
+        "--data_path=data"
+      ],
+      "env": {
+        "CUDA_VISIBLE_DEVICES": "0",
+        "OMP_NUM_THREADS": "12",
+        "PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT": "5.0"
+      }
+    }
+  ]
+}
