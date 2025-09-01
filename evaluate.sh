@@ -5,5 +5,6 @@ python main_finetune.py \
     --eval \
     --resume output/checkpoint-299.pth \
     --model vit_base_patch16 \
-    --batch_size 16 \
-    --data_path data
+    --batch_size 256 \
+    --data_path data \
+    --output_dir temp
