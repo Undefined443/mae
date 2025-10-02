@@ -1,5 +1,6 @@
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export OMP_NUM_THREADS=24
+OUTPUT_DIR="output/origin"
 
 torchrun \
     --nproc-per-node auto \
@@ -19,4 +20,7 @@ torchrun \
     --accum_iter 1 \
     --warmup_epochs 20 \
     --aa rand-m9-mstd0.5-inc1 \
-    --output_dir output
+    --dist_eval \
+    --output_dir $OUTPUT_DIR \
+    --log_dir $OUTPUT_DIR \
+    2>&1 | tee $OUTPUT_DIR/train.log
