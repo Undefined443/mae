@@ -1,10 +1,10 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
-export OMP_NUM_THREADS=12
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export OMP_NUM_THREADS=24
 
 torchrun \
     --nproc-per-node auto \
     main_finetune.py \
-    --batch_size 128 \
+    --batch_size 512 \
     --model vit_base_patch16 \
     --epochs 300 \
     --blr 1e-4 \
@@ -16,7 +16,7 @@ torchrun \
     --cutmix 1.0 \
     --dist_eval \
     --data_path data \
-    --accum_iter 8 \
+    --accum_iter 1 \
     --warmup_epochs 20 \
     --aa rand-m9-mstd0.5-inc1 \
     --output_dir output
